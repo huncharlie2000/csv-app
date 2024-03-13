@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Modifier</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script>
+        function validateForm() {
+            var fileInput = document.getElementById('file');
+            if (fileInput.files.length === 0) {
+                alert('Please select a CSV file');
+                return false; // Prevent form submission
+            }
+            return true; // Proceed with form submission
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>CSV Modifier</h1>
+        <form class="form-container" action="/modify" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <input type="file" id="file" name="file" accept=".csv">
+            <select name="operation">
+                <option value="addStateColumn">Add State Column</option>
+                <option value="goodStatesKept">Good States Kept</option>
+                <option value="badStatesRemoved">Bad States Removed</option>
+            </select>
+            <button type="submit">Modify CSV</button>
+        </form>
+    </div>
+</body>
+</html>
