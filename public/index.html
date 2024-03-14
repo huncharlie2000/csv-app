@@ -1,33 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSV Modifier</title>
-    <link rel="stylesheet" href="/styles.css">
-    <script>
-        function validateForm() {
-            var fileInput = document.getElementById('file');
-            if (fileInput.files.length === 0) {
-                alert('Please select a CSV file');
-                return false; // Prevent form submission
-            }
-            return true; // Proceed with form submission
-        }
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSV File Modifier</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>CSV Modifier</h1>
-        <form class="form-container" action="/modify" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
-            <input type="file" id="file" name="file" accept=".csv">
-            <select name="operation">
-                <option value="addStateColumn">Add State Column</option>
-                <option value="goodStatesKept">Good States Kept</option>
-                <option value="badStatesRemoved">Bad States Removed</option>
-            </select>
-            <button type="submit">Modify CSV</button>
-        </form>
-    </div>
+  <div class="container">
+    <h1>CSV File Modifier</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+      <label for="csvfile">Choose a CSV file:</label>
+      <input type="file" id="csvfile" name="csvfile" accept=".csv"><br><br>
+      
+      <label for="operation">Select an operation:</label>
+      <select id="operation" name="operation">
+        <option value="modifyState">Modify State</option>
+        <option value="capitalizeNames">Capitalize Names</option>
+      </select><br><br>
+      
+      <button type="submit">Submit</button>
+    </form>
+</div>
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const formData = new FormData();
+      formData.append('csvfile', document.getElementById('csvfile').files[0]);
+      formData.append('operation', document.getElementById('operation').value);
+
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.blob();
+      })
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'modified.csv';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(error => console.error('Error:', error));
+    });
+  </script>
 </body>
 </html>
