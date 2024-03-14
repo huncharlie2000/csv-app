@@ -426,23 +426,29 @@ const areaCodeToState = {
 };
 
 
-// Function to modify state based on phone numbers
 function modifyState(results) {
   results.forEach((row) => {
-    const phoneNumber = row.PhoneNumber
+    let phoneNumber = row.PhoneNumber;
+
+    // Remove leading '1' if present
+    if (phoneNumber.charAt(0) === '1') {
+      phoneNumber = phoneNumber.substring(1);
+    }
+
     const areaCode = phoneNumber.substring(0, 3); // Extract area code
     row.State = areaCodeToState[areaCode] || ''; // Lookup state based on area code
   });
 }
 
-  
-// Function to capitalize first letter of each word in FirstName column
-function capitalizeNames(results) {
+function addOneInFront(results) {
   results.forEach((row) => {
-    row.FirstName = row.FirstName.replace(/\b\w/g, char => char.toUpperCase());
+    // Check if the phone number starts with '1'
+    if (row.PhoneNumber.charAt(0) !== '1') {
+      // Add '1' in front of the phone number
+      row.PhoneNumber = '1' + row.PhoneNumber;
+    }
   });
 }
-
 
 app.post('/upload', upload.single('csvfile'), (req, res) => {
   if (!req.file) {
@@ -465,8 +471,8 @@ app.post('/upload', upload.single('csvfile'), (req, res) => {
         case 'modifyState':
           modifyState(results);
           break;
-        case 'capitalizeNames':
-          capitalizeNames(results);
+        case 'addOneInFront':
+          addOneInFront(results);
           break;
         default:
           return res.status(400).send('Invalid operation.');
